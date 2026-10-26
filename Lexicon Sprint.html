@@ -1,0 +1,567 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Lexicon Sprint</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=Public+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: one narrow column built for a phone held in one hand; a thin timer rail sits on top of every question. */
+:root{
+  --bg:#F4F6FB; --surface:#FFFFFF; --ink:#141B34; --muted:#5B6585; --line:#D9DEEC;
+  --accent:#2F4BFF; --accent-ink:#FFFFFF; --accent-soft:#E6EAFF;
+  --signal:#F2A900; --ok:#12805C; --ok-soft:#DDF5EA; --bad:#C4332B; --bad-soft:#FBE4E1;
+  --display:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;
+  --body:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0D1224; --surface:#161D36; --ink:#EEF1FB; --muted:#9AA5C8; --line:#2A3358;
+  --accent:#6F86FF; --accent-ink:#0D1224; --accent-soft:#222C57;
+  --signal:#FFC233; --ok:#4CD6A0; --ok-soft:#12332A; --bad:#FF7A70; --bad-soft:#3A1B1A; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0D1224; --surface:#161D36; --ink:#EEF1FB; --muted:#9AA5C8; --line:#2A3358;
+  --accent:#6F86FF; --accent-ink:#0D1224; --accent-soft:#222C57;
+  --signal:#FFC233; --ok:#4CD6A0; --ok-soft:#12332A; --bad:#FF7A70; --bad-soft:#3A1B1A; color-scheme:dark}
+*{box-sizing:border-box}
+html,body{min-height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.45;
+  padding-block:20px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));margin:0}
+.wrap{max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+.brand{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.mark{font-family:var(--display);font-weight:800;font-size:20px;letter-spacing:-.01em;user-select:none;-webkit-user-select:none}
+.mark b{color:var(--accent)}
+h1,h2,h3{font-family:var(--display);letter-spacing:-.015em;line-height:1.12;margin:0;text-wrap:balance}
+h1{font-size:30px} h2{font-size:23px} h3{font-size:17px}
+p{margin:0}
+.muted{color:var(--muted)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:14px}
+label{font-weight:600;font-size:14px}
+input[type=text],input[type=password],select,textarea{width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1.5px solid var(--line);border-radius:10px;padding:13px 14px;min-height:48px}
+textarea{min-height:140px;resize:vertical;font-size:13px}
+input:focus,select:focus,textarea:focus,button:focus-visible{outline:3px solid var(--accent);outline-offset:1px}
+.code-in{font-family:var(--display);font-weight:700;font-size:24px;letter-spacing:.14em;text-transform:uppercase;text-align:center}
+.btn{font:inherit;font-weight:700;border:0;border-radius:12px;padding:14px 18px;min-height:52px;cursor:pointer;background:var(--accent);color:var(--accent-ink);width:100%}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+.btn.small{min-height:40px;padding:8px 14px;width:auto;font-size:14px}
+.err{background:var(--bad-soft);color:var(--bad);border-radius:10px;padding:10px 12px;font-size:14px;font-weight:600}
+.note{background:var(--accent-soft);border-radius:10px;padding:12px 14px;font-size:14px}
+.rules{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px}
+.rules li{display:grid;grid-template-columns:28px 1fr;gap:10px;font-size:15px}
+.rules .n{width:28px;height:28px;border-radius:8px;background:var(--accent-soft);color:var(--accent);font-weight:700;display:grid;place-items:center;font-size:14px}
+.chk{display:flex;gap:10px;align-items:flex-start;font-weight:500;font-size:15px}
+.chk input{width:22px;height:22px;margin-top:2px;flex:none}
+/* quiz */
+.q-top{display:flex;justify-content:space-between;align-items:baseline;gap:12px;font-size:14px;color:var(--muted);font-weight:600}
+.rail{height:8px;background:var(--line);border-radius:99px;overflow:hidden}
+.rail i{display:block;height:100%;width:100%;background:var(--accent);transform-origin:left center;transform:scaleX(1)}
+.rail.low i{background:var(--signal)} .rail.crit i{background:var(--bad)}
+.secs{font-variant-numeric:tabular-nums;font-family:var(--display);font-size:22px;color:var(--ink);font-weight:800}
+.tag{align-self:flex-start;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.prompt{font-family:var(--display);font-weight:700;font-size:22px;line-height:1.28;text-wrap:pretty}
+.blank{display:inline-block;min-width:3.2em;border-bottom:3px solid var(--accent);vertical-align:baseline;margin:0 2px}
+.opts{display:flex;flex-direction:column;gap:10px}
+.opt{display:grid;grid-template-columns:34px 1fr;gap:12px;align-items:center;text-align:left;font:inherit;font-size:17px;font-weight:500;color:var(--ink);background:var(--surface);border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;min-height:58px;cursor:pointer;width:100%}
+.opt .l{width:32px;height:32px;border-radius:9px;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;font-weight:700;font-size:14px}
+.opt:active{border-color:var(--accent)}
+.opt.picked{border-color:var(--accent);background:var(--accent-soft)}
+.opt:disabled{cursor:default}
+.nosel{user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+/* match */
+.terms{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.term{font:inherit;font-weight:700;font-size:15px;border:2px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:10px;min-height:52px;cursor:pointer;text-align:center}
+.term.sel{border-color:var(--accent);background:var(--accent-soft)}
+.term.done{opacity:.55}
+.defs{display:flex;flex-direction:column;gap:8px}
+.def{font:inherit;font-size:15px;text-align:left;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:10px 12px;cursor:pointer;min-height:52px;width:100%}
+.def small{display:block;font-weight:700;font-size:12px;color:var(--accent);margin-bottom:2px}
+.def.paired{border-color:var(--accent);background:var(--accent-soft)}
+/* result */
+.big{font-family:var(--display);font-weight:800;font-size:56px;line-height:1;font-variant-numeric:tabular-nums}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat{background:var(--bg);border-radius:10px;padding:10px;text-align:center}
+.stat b{display:block;font-family:var(--display);font-size:20px;font-variant-numeric:tabular-nums}
+.stat span{font-size:12px;color:var(--muted)}
+.codebox{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;word-break:break-all;min-height:90px}
+.warn{background:var(--bad-soft);color:var(--bad);border-radius:10px;padding:12px 14px;font-size:14px;font-weight:600}
+.count{font-family:var(--display);font-weight:800;font-size:96px;text-align:center;color:var(--accent);padding:30px 0;font-variant-numeric:tabular-nums}
+/* teacher */
+.tabs{display:flex;gap:6px;flex-wrap:wrap}
+.tab{font:inherit;font-weight:600;font-size:14px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:99px;padding:8px 14px;cursor:pointer}
+.tab[aria-selected="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.bigcode{font-family:var(--display);font-weight:800;font-size:44px;letter-spacing:.1em;text-align:center;color:var(--accent);padding:6px 0;word-break:break-all}
+.tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px}
+table{border-collapse:collapse;width:100%;font-size:14px;min-width:520px}
+th,td{padding:9px 10px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:var(--bg);position:sticky;top:0}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+.pill{display:inline-block;border-radius:99px;padding:2px 9px;font-size:12px;font-weight:700}
+.pill.bad{background:var(--bad-soft);color:var(--bad)} .pill.ok{background:var(--ok-soft);color:var(--ok)}
+.podium{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;align-items:end}
+.pod{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 8px;text-align:center}
+.pod .r{font-family:var(--display);font-weight:800;font-size:26px;color:var(--accent)}
+.pod .nm{font-weight:700;word-break:break-word}
+.pod.p1{padding-block:22px;border-color:var(--signal);border-width:2px}
+.keylist{display:flex;flex-direction:column;gap:8px;font-size:14px}
+.keylist div{border-bottom:1px solid var(--line);padding-bottom:8px}
+.keylist b{color:var(--ok)}
+.hidden-tap{background:none;border:0;color:var(--muted);font:inherit;font-size:13px;padding:14px;text-decoration:underline;align-self:center}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="wrap" id="app" aria-live="polite"></div>
+
+<script>
+// k: g = fill the gap, m = meaning. First option is always the correct one (shuffled at runtime).
+const MCQ = [
+ // Starter
+ {k:"g", q:"Many people carry a lucky charm because of an old ______ that it brings good luck.", o:["superstition","substitution","transmission","punishment"]},
+ {k:"g", q:"After his business failed, he lost his entire ______.", o:["fortune","incense","pageant","chimney"]},
+ {k:"m", q:"What does “to bid farewell to” someone mean?", o:["to say goodbye to them","to offer them a gift","to ask for their help","to give them a warning"]},
+ {k:"m", q:"Which word means the ability to produce children, young animals or crops?", o:["fertility","boredom","anonymity","evidence"]},
+ // Unit 1
+ {k:"m", q:"Which phrase is closest in meaning to “sophisticated”?", o:["refined and experienced","simple and plain","loud and rude","slow and lazy"]},
+ {k:"g", q:"More and more students ______ online courses instead of attending lectures.", o:["are opting for","are persevering","are restraining","are imploding"]},
+ {k:"m", q:"Which word describes something so enjoyable that it is very hard to stop doing or using it?", o:["addictive","nutritious","humane","subtle"]},
+ {k:"g", q:"A government agency ______ the safety of all food products in the country.", o:["oversees","skyrockets","persists","attracts"]},
+ {k:"g", q:"The city ______ a famous sculptor to create a statue for the main square.", o:["commissioned","imploded","persevered","disengaged"]},
+ {k:"g", q:"The advertisement ______ young people, so sales rose quickly.", o:["appealed to","was due to","was treating","passed down"]},
+ // Unit 2
+ {k:"m", q:"Someone with an “eclectic” taste in music likes…", o:["many different styles","only one style","only very old songs","only very loud songs"]},
+ {k:"m", q:"A person who is “infamous” is…", o:["well known for something bad","well known for something good","not known at all","famous only in their own town"]},
+ {k:"g", q:"The children screamed with sheer and utter ______ when they saw the snow.", o:["delight","boredom","treason","punishment"]},
+ {k:"g", q:"The writer ______ that reading fiction makes people more understanding.", o:["asserts","carves","upgrades","restrains"]},
+ {k:"m", q:"If a singer’s popularity “reached new heights”, it…", o:["became greater than ever before","disappeared quickly","stayed the same","was only local"]},
+ {k:"g", q:"A long walk in the forest can help you ______ stress.", o:["relieve","commission","assert","oversee"]},
+ {k:"m", q:"If someone wants to “keep his anonymity”, he wants…", o:["to remain unknown to the public","to become famous","to hide his money","to change his job"]},
+ // Unit 3
+ {k:"m", q:"The “psyche” of a person is their…", o:["mind and emotions","body and muscles","family and friends","past and future"]},
+ {k:"m", q:"“You’re bound to enjoy this concert” means you…", o:["will almost certainly enjoy it","must pay for it","might not go","should avoid it"]},
+ {k:"m", q:"“When it comes to music, she has great taste.” Here, “when it comes to” means…", o:["on the subject of","at the moment of arrival","after a long time","instead of"]},
+ {k:"m", q:"A song that “gets deep into your bones and sticks with you” is one that…", o:["affects you strongly and stays with you","makes you feel ill","you sing very loudly","you only hear once"]},
+ {k:"m", q:"Which word means “not obvious; delicate and hard to notice”?", o:["subtle","prominent","vast","primary"]},
+ {k:"g", q:"Many folk songs were ______ from grandparents to grandchildren.", o:["passed down","chased after","carved out","blended together"]},
+ {k:"m", q:"Something learned “aurally” is learned…", o:["by listening","by reading","by writing","by touching"]},
+ // Unit 4
+ {k:"m", q:"An “entrepreneurial” person is…", o:["ready to start new businesses and take risks","afraid of change","good at following orders","already very rich"]},
+ {k:"m", q:"The first product was “a complete disaster”. It was…", o:["a total failure","a small success","a surprise gift","a secret project"]},
+ {k:"m", q:"To have “forged a new path to success” means to have…", o:["created a new way of succeeding","copied someone else’s work","lost the way","given up"]},
+ {k:"g", q:"Even when everyone laughed at him, he continued to ______ and finally succeeded.", o:["persevere","skyrocket","implode","commission"]},
+ {k:"g", q:"After the video went viral, the number of her followers began to ______.", o:["skyrocket","restrain","persist","disengage"]},
+ {k:"g", q:"The company ______ after its main investor withdrew, and thousands lost their jobs.", o:["imploded","skyrocketed","persevered","expanded"]},
+ // Unit 5
+ {k:"m", q:"“Treason” is…", o:["a crime against one’s own country or ruler","a Christmas dessert","a type of festival","a traditional costume"]},
+ {k:"g", q:"Giving presents at Christmas is ______ of the gifts of the three wise men.", o:["symbolic","reusable","nutritious","addictive"]},
+ {k:"g", q:"Christmas presents are traditionally ______ close friends and family.", o:["reserved for","bound to","opted for","appealed to"]},
+ {k:"g", q:"For every charity card sold, ______ the price goes to charity.", o:["a percentage of","harvest time","an alternative","a sleigh"]},
+ {k:"m", q:"“The Halloween tradition was adopted by Americans.” This means they…", o:["accepted it and started to use it","invented it","forgot it","sold it"]},
+ {k:"g", q:"Plastic is bad for the planet, so many shops now sell ______ bags that can be used again and again.", o:["reusable","addictive","nutritious","subtle"]},
+];
+
+const MATCH = [
+ {title:"Food words", pairs:[["oatmeal","a cereal made from crushed oats, often eaten as porridge"],["treacle","a thick, dark, sweet syrup"],["toffee","a hard, sticky sweet made from boiled sugar and butter"],["marshmallow","a soft, spongy, white sweet"]]},
+ {title:"Things and objects", pairs:[["sleigh","a vehicle on runners, pulled over snow"],["chimney","a pipe or passage through which smoke leaves a house"],["skull","the bones of the head"],["dagger","a short pointed knife used as a weapon"]]},
+ {title:"Slang phrases", pairs:[["chow down at a fast-food joint","eat quickly at a cheap restaurant"],["paint the town red","go out and celebrate in a lively way"],["catch a flick","go to see a film"],["keep it low-key","avoid attracting attention"]]},
+ {title:"Words about tradition", pairs:[["orally","by speaking"],["rural","connected with the countryside"],["prominent","well known and easy to notice"],["blend together","mix so that the parts cannot be separated"]]},
+ {title:"Success and failure", pairs:[["desperate","hopeless and ready to try anything"],["restrain","to hold back or control"],["persist","to continue firmly despite difficulty"],["a cure for","something that makes an illness go away"]]},
+ {title:"Events and people", pairs:[["pageant","a public show or competition with costumes"],["a regulatory body","an organisation that controls the rules of an activity"],["hardcore fans","extremely devoted followers"],["harvest time","the season when crops are collected"]]},
+];
+
+
+/* ---------- constants ---------- */
+const SECRET = "lexicon-sprint-7f3a-gv26";
+const EPOCH = Date.UTC(2026,0,1);
+const ALPHA = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ"; // no 0 1 I O
+const TEACHER_PIN = "4127";
+const T_MCQ = 25, T_GAP = 30, T_MATCH = 75;
+const TOTAL_ITEMS = MCQ.length + MATCH.length*4;
+const LS_KEY = "lexsprint.student.v1", LS_LEDGER = "lexsprint.ledger.v1";
+
+/* ---------- helpers ---------- */
+const $ = (s,r=document)=>r.querySelector(s);
+const app = $("#app");
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function lsGet(k){try{const v=localStorage.getItem(k);return v?JSON.parse(v):null}catch(e){return null}}
+function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+function lsDel(k){try{localStorage.removeItem(k)}catch(e){}}
+function cyrb(str){let h1=0xdeadbeef,h2=0x41c6ce57;for(let i=0;i<str.length;i++){const ch=str.charCodeAt(i);h1=Math.imul(h1^ch,2654435761);h2=Math.imul(h2^ch,1597334677);}
+  h1=Math.imul(h1^(h1>>>16),2246822507)^Math.imul(h2^(h2>>>13),3266489909);h2=Math.imul(h2^(h2>>>16),2246822507)^Math.imul(h1^(h1>>>13),3266489909);return 4294967296*(2097151&h2)+(h1>>>0);}
+function toB32(n,w){let s="";for(let i=0;i<w;i++){s=ALPHA[n%32]+s;n=Math.floor(n/32);}return s;}
+function fromB32(s){let n=0;for(const c of s){const i=ALPHA.indexOf(c);if(i<0)return NaN;n=n*32+i;}return n;}
+function chk(str,w){return toB32(cyrb(SECRET+str)%Math.pow(32,w),w);}
+function fmtTime(ms){return new Date(ms).toLocaleString([], {day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"});}
+function hm(ms){return new Date(ms).toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"});}
+
+/* ---------- class code ---------- */
+function makeCode(group,durUnits){
+  const start=Math.floor((Date.now()-EPOCH)/300000);
+  const body=toB32(start,4)+ALPHA[durUnits-1]+ALPHA[group-1];
+  const full=body+chk(body,2);
+  return full.slice(0,4)+"-"+full.slice(4);
+}
+function readCode(input){
+  const c=String(input||"").toUpperCase().replace(/[^A-Z0-9]/g,"");
+  if(c.length!==8)return {ok:false,why:"The code has 8 characters, like ABCD-EFGH."};
+  const body=c.slice(0,6);
+  if(chk(body,2)!==c.slice(6))return {ok:false,why:"This code is not correct. Check it and try again."};
+  const start=EPOCH+fromB32(body.slice(0,4))*300000;
+  const dur=(ALPHA.indexOf(body[4])+1)*1800000;
+  const group=ALPHA.indexOf(body[5])+1;
+  return {ok:true,code:c,start,end:start+dur,group};
+}
+function codePretty(c){return c.slice(0,4)+"-"+c.slice(4);}
+
+/* ---------- result code ---------- */
+function b64e(s){return btoa(unescape(encodeURIComponent(s))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");}
+function b64d(s){s=s.replace(/-/g,"+").replace(/_/g,"/");while(s.length%4)s+="=";return decodeURIComponent(escape(atob(s)));}
+function makeResult(r){const j=JSON.stringify(r);const p=b64e(j);return "VQ1-"+p+"."+chk(p,6);}
+function parseResults(text){
+  const out=[];const re=/VQ1-([A-Za-z0-9_-]+)\.([A-Z0-9]{6})/g;let m;
+  while((m=re.exec(text))){
+    const raw=m[0];let rec=null,valid=false;
+    try{rec=JSON.parse(b64d(m[1]));valid=chk(m[1],6)===m[2];}catch(e){continue}
+    out.push({raw,rec,valid});
+  }
+  return out;
+}
+
+/* ---------- student state ---------- */
+let S=lsGet(LS_KEY)||null; // {name, code, group, start,end, attempt, flags:[{q,why}], status:'ready'|'playing'|'left'|'done', qi, result, resultCode}
+function saveS(){lsSet(LS_KEY,S)}
+
+let quiz=null; // live attempt, not persisted
+let timerId=null;
+
+/* ---------- screens ---------- */
+function view(html){app.innerHTML='<div class="brand"><div class="mark" id="mark">Lexicon <b>Sprint</b></div><div class="muted" id="tmeta"></div></div>'+html;}
+
+function screenJoin(msg){
+  view(`<div class="card">
+    <h1>Vocabulary challenge</h1>
+    <p class="muted">Units 1–5 · about 25 minutes · on your phone</p>
+    <div><label for="nm">Your full name</label><input type="text" id="nm" autocomplete="off" maxlength="40" placeholder="Name and surname"></div>
+    <div><label for="cd">Class code from your teacher</label><input type="text" id="cd" class="code-in" autocomplete="off" maxlength="9" placeholder="ABCD-EFGH"></div>
+    ${msg?`<div class="err" role="alert">${esc(msg)}</div>`:""}
+    <button class="btn" id="go">Continue</button>
+  </div><button class="hidden-tap" id="tt">Teacher login</button>`);
+  const n=lsGet("lexsprint.lastname"); if(n)$("#nm").value=n;
+  $("#go").onclick=()=>{
+    const name=$("#nm").value.trim().replace(/\s+/g," ");
+    if(name.length<3)return screenJoin("Please write your full name.");
+    const c=readCode($("#cd").value);
+    if(!c.ok)return screenJoin(c.why);
+    const now=Date.now();
+    if(now<c.start-300000)return screenJoin("This session has not started yet.");
+    if(now>c.end)return screenJoin("This code has expired. Ask your teacher for a new one.");
+    lsSet("lexsprint.lastname",name);
+    S={name,code:c.code,group:c.group,start:c.start,end:c.end,attempt:1,flags:[],status:"ready",qi:0};
+    saveS();screenReady();
+  };
+  $("#tt").onclick=()=>teacherEntry();
+}
+
+function screenReady(){
+  view(`<div class="card">
+    <h2>Before you start, ${esc(S.name.split(" ")[0])}</h2>
+    <ul class="rules">
+      <li><span class="n">1</span><span><b>${MCQ.length+MATCH.length} screens</b>, each with its own timer. The whole test takes up to 25 minutes.</span></li>
+      <li><span class="n">2</span><span>Faster correct answers earn more points. You cannot go back.</span></li>
+      <li><span class="n">3</span><span><b>Stay on this page.</b> If you switch app, open another tab, lock the screen or reload, your attempt starts again from question 1 and your teacher sees it.</span></li>
+      <li><span class="n">4</span><span>Turn on <b>Do Not Disturb</b> and keep the screen awake so a message cannot interrupt you.</span></li>
+      <li><span class="n">5</span><span>No dictionaries, no AI, no help. Your teacher wants to see what you know.</span></li>
+    </ul>
+    <label class="chk"><input type="checkbox" id="ok"> <span>I understand the rules.</span></label>
+    <button class="btn" id="st" disabled>Start</button>
+  </div>`);
+  $("#ok").onchange=e=>{$("#st").disabled=!e.target.checked};
+  $("#st").onclick=()=>countdown();
+}
+
+function screenLeft(){
+  const n=S.flags.length;
+  view(`<div class="card">
+    <h2>You left the page</h2>
+    <div class="warn">Your attempt was stopped and recorded. This is attempt ${S.attempt} and you have left the page ${n} time${n===1?"":"s"}.</div>
+    <p>The test starts again from question 1 with the questions in a new order. You do not need your teacher to let you in again.</p>
+    <button class="btn" id="re">Start again</button>
+  </div>`);
+  $("#re").onclick=()=>countdown();
+}
+
+function countdown(){
+  S.status="ready";saveS();
+  let n=3;view(`<div class="card"><p class="muted" style="text-align:center">Starting. Stay on this page.</p><div class="count" id="cn">3</div></div>`);
+  quiz={phase:"count"};
+  const t=setInterval(()=>{n--;if(n<=0){clearInterval(t);startQuiz();}else{const e=$("#cn");if(e)e.textContent=n;}},800);
+  quiz.t=t;
+}
+
+function buildItems(){
+  const items=MCQ.map((q,i)=>({type:"mcq",id:i,q}));
+  MATCH.forEach((m,i)=>items.push({type:"match",id:i,m}));
+  return shuffle(items);
+}
+
+function startQuiz(){
+  S.status="playing";S.qi=0;saveS();
+  quiz={phase:"play",items:buildItems(),i:0,points:0,correct:0,startedAt:Date.now(),qStart:0};
+  showItem();
+}
+
+function stopTimer(){if(timerId){clearInterval(timerId);timerId=null}}
+
+function runTimer(secs,onEnd){
+  stopTimer();
+  const rail=$("#rail"),bar=$("#bar"),sec=$("#secs");
+  const t0=performance.now(),total=secs*1000;
+  quiz.qStart=t0;quiz.total=total;
+  timerId=setInterval(()=>{
+    const left=Math.max(0,total-(performance.now()-t0));
+    const f=left/total;
+    if(bar)bar.style.transform="scaleX("+f+")";
+    if(sec)sec.textContent=Math.ceil(left/1000);
+    if(rail){rail.className="rail"+(f<.2?" crit":f<.4?" low":"")}
+    if(left<=0){stopTimer();onEnd();}
+  },100);
+}
+function frac(){const left=Math.max(0,quiz.total-(performance.now()-quiz.qStart));return left/quiz.total;}
+function award(f){return Math.round(600+400*f);}
+
+function showItem(){
+  if(quiz.i>=quiz.items.length)return finish();
+  S.qi=quiz.i+1;saveS();
+  const it=quiz.items[quiz.i];
+  if(it.type==="mcq")showMcq(it);else showMatch(it);
+}
+
+function topBar(it){
+  return `<div class="q-top"><span>${quiz.i+1} of ${quiz.items.length}</span><span class="secs" id="secs"></span></div>
+  <div class="rail" id="rail"><i id="bar"></i></div>`;
+}
+
+function showMcq(it){
+  const q=it.q;
+  const opts=shuffle(q.o.map((t,i)=>({t,ok:i===0})));
+  const prompt=esc(q.q).replace(/______/g,'<span class="blank"></span>');
+  const tag=q.k==="g"?"Fill the gap":"Meaning";
+  view(`${topBar(it)}<div class="card nosel"><span class="tag">${tag}</span><div class="prompt">${prompt}</div>
+    <div class="opts">${opts.map((o,i)=>`<button class="opt" data-i="${i}"><span class="l">${"ABCD"[i]}</span><span>${esc(o.t)}</span></button>`).join("")}</div></div>`);
+  let done=false;
+  const end=(pick)=>{
+    if(done)return;done=true;stopTimer();
+    const ok=pick!=null&&opts[pick].ok;
+    if(ok){quiz.points+=award(frac());quiz.correct++;}
+    app.querySelectorAll(".opt").forEach((b,i)=>{b.disabled=true;if(i===pick)b.classList.add("picked")});
+    setTimeout(()=>{quiz.i++;showItem()},250);
+  };
+  app.querySelectorAll(".opt").forEach(b=>b.onclick=()=>end(+b.dataset.i));
+  runTimer(q.k==="g"?T_GAP:T_MCQ,()=>end(null));
+}
+
+function showMatch(it){
+  const pairs=it.m.pairs;
+  const terms=shuffle(pairs.map((p,i)=>({i,t:p[0]})));
+  const defs=shuffle(pairs.map((p,i)=>({i,d:p[1]})));
+  const asg={}; // defPos -> termIdx
+  let sel=null;
+  view(`${topBar(it)}<div class="card nosel"><span class="tag">Match · ${esc(it.m.title)}</span>
+    <p class="muted" style="font-size:14px">Tap a word, then tap its meaning. Tap a matched meaning to undo.</p>
+    <div class="terms" id="terms"></div><div class="defs" id="defs"></div>
+    <button class="btn" id="sub" disabled>Submit matches</button></div>`);
+  let done=false;
+  function paint(){
+    const used=new Set(Object.values(asg));
+    $("#terms").innerHTML=terms.map((t,k)=>`<button class="term ${sel===t.i?"sel":""} ${used.has(t.i)?"done":""}" data-k="${k}">${esc(t.t)}</button>`).join("");
+    $("#defs").innerHTML=defs.map((d,k)=>`<button class="def ${asg[k]!=null?"paired":""}" data-k="${k}">${asg[k]!=null?`<small>${esc(pairs[asg[k]][0])}</small>`:""}${esc(d.d)}</button>`).join("");
+    $("#sub").disabled=Object.keys(asg).length<4;
+    app.querySelectorAll(".term").forEach(b=>b.onclick=()=>{const t=terms[+b.dataset.k];if(used.has(t.i))return;sel=sel===t.i?null:t.i;paint();});
+    app.querySelectorAll(".def").forEach(b=>b.onclick=()=>{const k=+b.dataset.k;if(asg[k]!=null){delete asg[k];paint();return;}if(sel==null)return;asg[k]=sel;sel=null;paint();});
+  }
+  paint();
+  const end=()=>{
+    if(done)return;done=true;stopTimer();
+    let c=0;Object.keys(asg).forEach(k=>{if(defs[k].i===asg[k])c++;});
+    quiz.correct+=c;quiz.points+=Math.round(award(frac())*c/4);
+    setTimeout(()=>{quiz.i++;showItem()},150);
+  };
+  $("#sub").onclick=end;
+  runTimer(T_MATCH,end);
+}
+
+function finish(){
+  stopTimer();
+  const secs=Math.round((Date.now()-quiz.startedAt)/1000);
+  S.status="done";
+  const r={v:1,n:S.name,g:S.group,c:S.code,s:quiz.points,k:quiz.correct,t:secs,a:S.attempt,
+    f:S.flags.slice(0,12).map(x=>x.q+(x.why==="reload"?"r":"")),fc:S.flags.length,ts:Date.now()};
+  S.result={points:quiz.points,correct:quiz.correct,secs};
+  S.resultCode=makeResult(r);saveS();
+  quiz=null;screenDone();
+}
+
+function screenDone(){
+  const r=S.result,n=S.flags.length;
+  view(`<div class="card">
+    <h2>Finished, ${esc(S.name.split(" ")[0])}</h2>
+    <div class="big">${r.points.toLocaleString()}</div>
+    <div class="stats"><div class="stat"><b>${r.correct}/${TOTAL_ITEMS}</b><span>correct</span></div>
+      <div class="stat"><b>${Math.floor(r.secs/60)}:${String(r.secs%60).padStart(2,"0")}</b><span>time</span></div>
+      <div class="stat"><b>${n}</b><span>left the page</span></div></div>
+    ${n?`<div class="warn">You left the page ${n} time${n===1?"":"s"} during the test. This is part of your result.</div>`:""}
+  </div>
+  <div class="card">
+    <h3>Send this code to your teacher</h3>
+    <p class="muted" style="font-size:14px">Copy it and send it in the group chat your teacher told you. Your name, score and result are inside the code.</p>
+    <textarea class="codebox" id="rc" readonly></textarea>
+    <button class="btn" id="cp">Copy code</button>
+    <p class="muted" id="cpmsg" style="font-size:14px;min-height:20px"></p>
+  </div>`);
+  $("#rc").value=S.resultCode;
+  $("#rc").onfocus=e=>e.target.select();
+  $("#cp").onclick=async()=>{
+    const m=$("#cpmsg");
+    try{await navigator.clipboard.writeText(S.resultCode);m.textContent="Copied. Paste it in the chat.";}
+    catch(e){const t=$("#rc");t.focus();t.select();m.textContent="Press and hold the code, then choose Copy.";}
+  };
+}
+
+/* ---------- leaving the page ---------- */
+function onLeave(why){
+  if(!S||!quiz)return;
+  if(quiz.phase!=="play"&&quiz.phase!=="count")return;
+  const q=quiz.phase==="play"?quiz.i+1:0;
+  if(quiz.t)clearInterval(quiz.t);
+  stopTimer();
+  S.flags.push({q,why:why==="hidden"?"left":"left"});
+  S.attempt++;S.status="left";saveS();
+  quiz=null;
+  screenLeft();
+}
+document.addEventListener("visibilitychange",()=>{if(document.hidden)onLeave("hidden")});
+window.addEventListener("pagehide",()=>{if(S&&S.status==="playing")saveS();onLeave("hidden")});
+["contextmenu","copy","cut"].forEach(ev=>document.addEventListener(ev,e=>{if(quiz)e.preventDefault()}));
+
+/* ---------- teacher ---------- */
+let isTeacher=false;
+async function checkOwner(){
+  try{const u=await window.claude?.use?.("user");if(u&&await u.isOwner())return true;}catch(e){}
+  return false;
+}
+function teacherEntry(){
+  view(`<div class="card"><h2>Teacher tools</h2>
+    <div><label for="pin">Teacher PIN</label><input type="password" id="pin" inputmode="numeric" autocomplete="off"></div>
+    <div class="err" id="pe" hidden>Wrong PIN.</div>
+    <button class="btn" id="pg">Open</button><button class="btn ghost" id="bk">Back</button></div>`);
+  $("#pg").onclick=()=>{if($("#pin").value===TEACHER_PIN){isTeacher=true;teacherHome("code");}else $("#pe").hidden=false;};
+  $("#bk").onclick=()=>route();
+}
+
+function ledger(){return lsGet(LS_LEDGER)||{items:[]};}
+
+function teacherHome(tab){
+  view(`<div class="tabs" role="tablist">
+    <button class="tab" role="tab" data-t="code" aria-selected="${tab==="code"}">New class code</button>
+    <button class="tab" role="tab" data-t="res" aria-selected="${tab==="res"}">Results</button>
+    <button class="tab" role="tab" data-t="key" aria-selected="${tab==="key"}">Answer key</button>
+    <button class="tab" role="tab" data-t="stu" aria-selected="false">Student view</button></div><div id="tbody" style="display:flex;flex-direction:column;gap:16px"></div>`);
+  app.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{if(b.dataset.t==="stu"){route(true);return;}teacherHome(b.dataset.t)});
+  if(tab==="code")tCode();else if(tab==="res")tResults();else tKey();
+}
+
+function tCode(){
+  $("#tbody").innerHTML=`<div class="card"><h2>Open a session</h2>
+    <p class="muted" style="font-size:14px">Make one code for each group. Students need the code to start, and it stops working when the time is up.</p>
+    <div class="row2"><div><label for="grp">Group</label><select id="grp">${[1,2,3,4,5,6,7,8].map(i=>`<option value="${i}">Group ${i}</option>`).join("")}</select></div>
+    <div><label for="dur">Code works for</label><select id="dur"><option value="1">30 minutes</option><option value="2" selected>1 hour</option><option value="4">2 hours</option><option value="6">3 hours</option></select></div></div>
+    <button class="btn" id="mk">Create code</button></div><div id="out"></div>
+    <div class="note">Write the code on the board or say it aloud. Do not send it in a chat where absent students can see it. Students can still finish a test they started before the code expired.</div>`;
+  $("#mk").onclick=()=>{
+    const g=+$("#grp").value,d=+$("#dur").value;
+    const code=makeCode(g,d);const c=readCode(code);
+    $("#out").innerHTML=`<div class="card"><span class="tag">Group ${g}</span><div class="bigcode">${code}</div>
+      <p style="text-align:center" class="muted">Valid from ${hm(c.start)} until <b>${hm(c.end)}</b>, ${fmtTime(c.end).split(",")[0]}</p></div>`;
+  };
+}
+
+function tResults(){
+  const L=ledger();
+  $("#tbody").innerHTML=`<div class="card"><h2>Add results</h2>
+    <p class="muted" style="font-size:14px">Results are saved on this device only. Copy all the messages from your group chat and paste them here. Only the result codes are read; anything else is ignored.</p>
+    <textarea id="paste" placeholder="Paste here"></textarea>
+    <button class="btn" id="add">Add results</button><div id="addmsg" class="muted" style="font-size:14px"></div></div>
+    <div id="boards"></div>`;
+  $("#add").onclick=()=>{
+    const found=parseResults($("#paste").value);
+    const have=new Set(L.items.map(x=>x.raw));let added=0,dup=0;
+    found.forEach(f=>{if(have.has(f.raw)){dup++;return;}have.add(f.raw);L.items.push(f);added++;});
+    lsSet(LS_LEDGER,L);$("#paste").value="";
+    $("#addmsg").textContent=`${added} added${dup?`, ${dup} already there`:""}. ${found.length===0?"No result codes found in the text.":""}`;
+    boards(L);
+  };
+  boards(L);
+}
+
+function boards(L){
+  const host=$("#boards");if(!L.items.length){host.innerHTML="";return;}
+  const byCode={};
+  L.items.forEach(x=>{const c=x.rec&&x.rec.c;(byCode[c||"?"]=byCode[c||"?"]||[]).push(x);});
+  const codes=Object.keys(byCode).sort((a,b)=>{const ra=readCode(a),rb=readCode(b);return (rb.start||0)-(ra.start||0)});
+  host.innerHTML=codes.map((c,ci)=>{
+    const info=readCode(c);const list=byCode[c].slice().sort((a,b)=>(b.rec.s||0)-(a.rec.s||0));
+    const clean=list.filter(x=>x.valid&&!(x.rec.fc>0));
+    const winners=clean.slice(0,3);
+    const title=info.ok?`Group ${info.group} · ${fmtTime(info.start)}`:"Unknown code";
+    return `<div class="card" data-c="${c}"><div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap"><h2>${title}</h2><span class="muted" style="font-size:13px">${list.length} result${list.length===1?"":"s"}</span></div>
+      <div><span class="tag">Winners (no flags)</span></div>
+      ${winners.length?`<div class="podium">${[1,0,2].map(i=>winners[i]?`<div class="pod ${i===0?"p1":""}"><div class="r">${i+1}</div><div class="nm">${esc(winners[i].rec.n)}</div><div class="muted">${(winners[i].rec.s||0).toLocaleString()}</div></div>`:"<div></div>").join("")}</div>`:`<p class="muted">No student without flags yet.</p>`}
+      <div class="tbl-wrap"><table><thead><tr><th>#</th><th>Name</th><th class="num">Points</th><th class="num">Correct</th><th class="num">Time</th><th>Left page</th></tr></thead><tbody>
+      ${list.map((x,i)=>{const r=x.rec;const fl=r.fc>0?`<span class="pill bad">${r.fc}×</span> <span class="muted">Q ${esc((r.f||[]).join(", "))}${(r.f||[]).some(v=>String(v).endsWith("r"))?" (r = reloaded)":""}</span>`:`<span class="pill ok">no</span>`;
+        const tm=`${Math.floor((r.t||0)/60)}:${String((r.t||0)%60).padStart(2,"0")}`;
+        return `<tr><td>${i+1}</td><td>${esc(r.n)}${(r.a>1+r.fc)?"":""}${x.valid?"":' <span class="pill bad">invalid code</span>'}</td><td class="num">${(r.s||0).toLocaleString()}</td><td class="num">${r.k}/${TOTAL_ITEMS}</td><td class="num">${tm}</td><td>${fl}</td></tr>`}).join("")}
+      </tbody></table></div>
+      <div class="row2"><button class="btn small copyt">Copy table</button><button class="btn small ghost delg">Remove this group</button></div><button class="btn small ghost copyc">Copy result codes for another device</button><p class="muted cmsg" style="font-size:13px"></p></div>`;
+  }).join("");
+  host.querySelectorAll(".card[data-c]").forEach(card=>{
+    const c=card.dataset.c;
+    card.querySelector(".copyt").onclick=async()=>{
+      const list=byCode[c].slice().sort((a,b)=>(b.rec.s||0)-(a.rec.s||0));
+      const tsv=["Rank\tName\tPoints\tCorrect\tSeconds\tLeft page\tAttempt"].concat(list.map((x,i)=>[i+1,x.rec.n,x.rec.s,x.rec.k+"/"+TOTAL_ITEMS,x.rec.t,x.rec.fc,x.rec.a].join("\t"))).join("\n");
+      const m=card.querySelector(".cmsg");
+      try{await navigator.clipboard.writeText(tsv);m.textContent="Copied. Paste into Excel or Google Sheets.";}catch(e){m.textContent="Copying is blocked here. Select the table and copy it.";}
+    };
+    card.querySelector(".copyc").onclick=async()=>{
+      const m=card.querySelector(".cmsg");
+      const txt=byCode[c].map(x=>x.raw).join("\n");
+      try{await navigator.clipboard.writeText(txt);m.textContent="Copied. On your other device, open Results and paste them in the box.";}catch(e){m.textContent="Copying is blocked here.";}
+    };
+    card.querySelector(".delg").onclick=function(){
+      if(this.dataset.sure!=="1"){this.dataset.sure="1";this.textContent="Tap again to remove";return;}
+      const L2=ledger();L2.items=L2.items.filter(x=>(x.rec&&x.rec.c||"?")!==c);lsSet(LS_LEDGER,L2);tResults();
+    };
+  });
+}
+
+function tKey(){
+  const rows=[];
+  MCQ.forEach((q,i)=>rows.push(`<div><span class="muted">Q${i+1} · ${q.k==="g"?"gap":"meaning"}</span><br>${esc(q.q)}<br><b>${esc(q.o[0])}</b></div>`));
+  MATCH.forEach((m,i)=>rows.push(`<div><span class="muted">Match ${i+1} · ${esc(m.title)}</span><br>${m.pairs.map(p=>`<b>${esc(p[0])}</b> = ${esc(p[1])}`).join("<br>")}</div>`));
+  $("#tbody").innerHTML=`<div class="card"><h2>Answer key</h2><p class="muted" style="font-size:14px">Correct answers are in bold. Students see the questions in a different order and the options in a different order each attempt.</p><div class="keylist">${rows.join("")}</div></div>`;
+}
+
+/* ---------- routing ---------- */
+function route(forceStudent){
+  stopTimer();quiz=null;
+  if(!forceStudent&&isTeacher){teacherHome("code");return;}
+  if(S&&S.status==="done"){screenDone();return;}
+  if(S&&S.status==="playing"){ // page was closed or reloaded during an attempt
+    S.flags.push({q:S.qi||0,why:"reload"});S.attempt++;S.status="left";saveS();screenLeft();return;}
+  if(S&&S.status==="left"){screenLeft();return;}
+  if(S&&S.status==="ready"){screenReady();return;}
+  screenJoin();
+}
+route();
+checkOwner().then(o=>{if(o&&!quiz&&(!S||S.status!=="playing")){isTeacher=true;if(!S||S.status==="ready"||S.status==="done"||!S)teacherHome("code");}});
+window.__ls={makeCode,readCode,parseResults,get S(){return S}};
+</script>
+
+</body></html>
